@@ -47,7 +47,7 @@ async function login(req, res) {
                 const response = {
                     name: firstName,
                     id: id,
-                    token
+                   token : token
                 };
                 res.send(response);
             } else {

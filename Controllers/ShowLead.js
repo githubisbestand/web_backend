@@ -2,7 +2,7 @@ const con = require("../db/db");
 
 async function showLead(req, res){
     try {
-        const sql = 'select * from leadTable';
+        const sql = 'select * from leadtable';
         con.query(sql, (err, result)=>{
             if(err) return res.json({message : "inside server error"});
             return res.json(result);

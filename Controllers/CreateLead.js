@@ -1,23 +1,24 @@
 const con = require("../db/db");
-
-
-async function createLead(req, res){
+async function CreateLead(req, res){
     try {
-        const sql = 'INSERT INTO leadTable(`name`, `email`, `mobile`) VALUES (?, ?, ?)';
+        const sql = 'INSERT into leadtable(name, email, mobile) values (?,?,?)';
+        console.log(req.body);
         const values = [
             req.body.name,
             req.body.email,
             req.body.mobile
-        ];
-        con.query(sql, values, (err, data) => {
-            if (err) return res.json({ error: err.message });
-            return res.json({ message: "Lead created successfully", data });
-        });
+        ]
+        console.log('values',values);
+        con.query(sql, values, (err, data)=>{
+            if (err) {
+               return res.status(400).send(err) 
+            }
+            return res.status(200).send(data)
+        })
     } catch (error) {
-        res.status(400).send(error);
+        console.log(error.message);
     }
 }
-
-module.exports = {
-    createLead
+module.exports ={
+    CreateLead
 }

@@ -5,13 +5,11 @@ const userControler = require("../Controllers/SavePAssword");
 const authControlers = require("../Controllers/Login");
 const verifyControlers = require("../Controllers/Verify");
 const sendOtpControlers = require("../Controllers/sendOtp");
-const createLeadControlers = require("../Controllers/CreateLead");
 const showLeadControlers = require("../Controllers/ShowLead");
 const deleteLeadControlers = require("../Controllers/DeleteLead");
-
-
-
-
+const showDetailsControls = require("../Controllers/showUser");
+const {jwtAuthMiddleWare} = require("../MiddlwWare/MiddleWare");
+const CreateLeadControllers = require("../Controllers/CreateLead");
 router.post("/send-otp",sendOtpControlers.sendOtp);
 
 router.post("/save-password",userControler.savePassword);
@@ -20,12 +18,13 @@ router.post("/login-password",authControlers.login);
 
 router.post("/verify-otp", verifyControlers.verifyOTP);
 
-router.post("/create-lead",createLeadControlers.createLead);
+router.post("/create-lead",jwtAuthMiddleWare, CreateLeadControllers.CreateLead);
 
-router.get("/show-Lead", showLeadControlers.showLead);
+router.get("/show-Lead", jwtAuthMiddleWare, showLeadControlers.showLead);
 
-router.delete("/deletelead:id",deleteLeadControlers.deleteLead);
+router.delete("/deletelead/:id", jwtAuthMiddleWare, deleteLeadControlers.DeleteLead);
 
+router.get("/showUser",jwtAuthMiddleWare,  showDetailsControls.showUser);
 
 
 
