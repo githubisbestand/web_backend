@@ -19,55 +19,65 @@ function otpGenerator(limit){
 }
 
 
-function getUserDetail(email, callback) {
-    const query = 'SELECT * FROM users WHERE email = ?';
-    con.query(query, [email], (error, results) => {
-        if (error) {
-            return callback(error, null);
-        } 
-        callback(null, results.length > 0 ? results[0] : null);
+function queryDatabase(params, query){
+  return new Promise((resolve, reject) => {
+    con.query(params, query,(err, result)=>{
+        if (err) {
+          reject(err)
+        }
+        resolve(result)
     });
+  });
 }
 
-async function sendOtp(req, res) {
+
+async function getUserDetail(email){
+    try {
+          const details = await queryDatabase('SELECT * FROM users WHERE email = ?',[email])
+          return details.length > 0 ? details[0] : null;
+    } catch (error) {
+          console.log({ message: 'error getUserDetails', error });
+          throw error;
+    }
+}
+
+
+
+async function sendOtp(req, res){
+  try {
     const { email } = req.body;
     const checkQuery = 'SELECT email FROM users WHERE email = ?';
-    con.query(checkQuery, [email], (checkError, checkResult)=>{
-        if(checkError){
-            return res.status(500).send("Error checking Email");
-        } else if(checkResult.length > 0){
-            getUserDetail(email, (error, userDetails) => {
-                if (error) {
-                    return res.status(500).send('Error retrieving user details');
-                } 
-                if(userDetails){
-                    return res.send(userDetails);
-                }
-                res.send({ message: 'Email exists, proceed to login' });
-                console.log("--------", userDetails);
-            });
-        } else {
-            const otp = otpGenerator(4).trim();
-            const query = 'INSERT INTO users (email, otp) VALUES (?, ?)';
-            con.query(query, [email, otp], (error, results) => { 
-                if (error) {
-                    console.error("Error inserting user:", error);
-                    return res.status(500).send('Error generating OTP');
-                }
-                const mailOptions = {
-                    from: 'your_email@gmail.com',
-                    to: email,
-                    subject: 'Your OTP Code',
-                    text: `Your OTP code is ${otp}`
-                };
-                res.send(results);
-            });
-        }
-    });
+    const checkResult = await queryDatabase(checkQuery, [email]);
+    console.log(checkResult);
+
+    if (checkResult.length > 0) {
+      const usersDetails = await getUserDetail(email);
+      if(usersDetails){
+        return res.status(200).send(usersDetails);
+      }
+      res.send({ message: 'Email exists, proceed to login' });
+      console.log("--------", usersDetails);
+    } else{
+      const otp = otpGenerator(4).trim();
+
+      const query = 'INSERT INTO users (email, otp) VALUES (?, ?)';
+      const results = await queryDatabase(query, [email,otp]);
+  
+      const mailOptions = {
+          from: 'prakashkumarpandey126@gmail.com',
+          to: email,
+          subject: 'Your OTP Code',
+          text: `Your OTP code is ${otp}`
+      };
+     res.send(results)
+    }
+  } catch (error) {
+    res.status(500).send(error);
+    console.log('error', error);
+  } 
 }
 
 module.exports = {
     sendOtp
 }
-
 

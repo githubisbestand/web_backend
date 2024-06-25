@@ -13,15 +13,13 @@ function queryDatabase(sql, values){
 }
 
 
-
-async function CreateLead(req, res){
+async function singup(req, res){
     try {
-        const sql = 'INSERT into leadtable(name, email, mobile) values (?,?,?)';
-        console.log(req.body);
+        const sql = 'INSERT into student(name, email, password) values (?,?,?)';
         const values = [
             req.body.name,
             req.body.email,
-            req.body.mobile
+            req.body.password
         ]
         const result =  await queryDatabase(sql, values);
         console.log('values',result);
@@ -33,5 +31,5 @@ async function CreateLead(req, res){
     }
 }
 module.exports ={
-    CreateLead
+    singup
 }

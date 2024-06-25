@@ -1,4 +1,4 @@
-const con = require('../db/db'); // Adjust the path as necessary
+const con = require('../db/db'); 
 
 async function verifyOTP(req, res) {
     try {
